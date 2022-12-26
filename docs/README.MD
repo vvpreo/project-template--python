@@ -49,3 +49,17 @@ Feel free to delete folders you are not usign in your project.
 #### Development
 - All scripts, and other commands must be ran from project's root directory.
 - It is recommended to add 5 to service ports for avoid conflicts with services running on their default ports. Default postgres port is 5432. If you want to use the same instance for OS and docker development, simpy map hosts **5**5432 on container's 5432
+- It is recomended to use snake case naming for *.py files and python packages
+- It is recommended to use common library for basic functions (logging, args/envs reading, etc...)
+
+#### CI/CD Recomendations
+- When pushing to `dev`, new version should be automatically deployed to appropriate stand for vevelopment purposes
+- When pushing to branch or adding tag with names one of below:
+  - `tst` - TEST 
+  - `uat` - UAT (User Acceptance Testing)
+  - `cnd` - Release Candidate
+  - `prd` - Production
+
+  It is recommended to automate deployment to appropriate stand.
+- It is recommended to automate CI for every new push to `dev`
+- It is recommended to add test stage to `dev` pipeline configuration.
