@@ -25,6 +25,7 @@ If you're still not agreed on base development template, suggest to use this one
 - If you are **r**efactoring, call branch `r/<goal_name__or__task_id>`
 
 #### Toolset
+- Using GIT
 - Using python 3.9+
 - Using pytest
 - Using poetry
@@ -64,3 +65,4 @@ Feel free to delete folders you are not usign in your project.
   It is recommended to automate deployment to appropriate stand.
 - It is recommended to automate CI for every new push to `dev`
 - It is recommended to add test stage to `dev` pipeline configuration.
+- It is recommended to prepare CI/CD templates and use only imports in your core projects.
