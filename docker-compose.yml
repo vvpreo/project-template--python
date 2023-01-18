@@ -27,7 +27,7 @@ services:
   postgres:
     image: postgres:13-alpine
     restart: unless-stopped
-    container_name: campaign_manager_local_db
+    container_name: local_db
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -40,6 +40,7 @@ services:
   minio:
     image: minio/minio
     restart: unless-stopped
+    container_name: local_minio
     ports:
       - 59000:9000
       - 59001:9001
