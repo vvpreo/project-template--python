@@ -43,7 +43,7 @@ jobs:
           CHAT_ID: '${{ secrets.TG_CHAT_ID }}'
 #          TOPIC_ID: 'YOUR_TOPIC_ID'
           TG_MSG_MARKDOWN_V2: |
-            🅰️🌐*SERVICE_NAME*🌐 - build failed
+            🅰️🌐*SERVICE_NAME*🌐 - DEV build failed
 
 
   Redeploy:
