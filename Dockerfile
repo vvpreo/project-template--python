@@ -1,4 +1,5 @@
 FROM python:3.9.5-slim
+LABEL org.opencontainers.image.source=https://github.com/your_gh_account/your_repo_name
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app

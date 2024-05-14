@@ -1,0 +1,102 @@
+name: DEV (Re)Deploy
+
+on:
+  workflow_dispatch:
+#  push:
+#    branches: [ 'main', 'hotfix', 'build_and_run_on_dev' ]
+
+jobs:
+  Build:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Notify Workflow started
+        if: success()
+        uses: vvpreo/gh-workflows/workflows/tg-notify@prod
+        with:
+          TELEGRAM_BOT_TOKEN: '${{ secrets.TG_BOT_TOKEN }}'
+          CHAT_ID: '${{ secrets.TG_CHAT_ID }}'
+#          TOPIC_ID: 'YOUR_TOPIC_ID'
+          TG_MSG_MARKDOWN_V2: |
+            🎬🌐*SERVICE_NAME*🌐 - Started
+
+      - name: Checkout repo to $GITHUB_WORKSPACE
+        uses: actions/checkout@v3
+
+      - name: 'Prepare image'
+        uses: vvpreo/gh-workflows/workflows/prepare-docker-image@prod
+        with:
+          REGISTRY_HOST: 'ghcr.io'
+          GITHUB_TOKEN: '${{ secrets.REG_WRITE_TOKEN }}'
+
+      - name: 'Set IMAGE_PREPARED tag'
+        uses: vvpreo/gh-workflows/workflows/set-tag@prod
+        with:
+          GITHUB_TOKEN: '${{ secrets.REG_WRITE_TOKEN }}'
+          TAG_BODY: 'IMAGE_PREPARED'
+          ADD_DATE_POSTFIX: 'YES'
+
+      - name: Notify Problem
+        if: failure()
+        uses: vvpreo/gh-workflows/workflows/tg-notify@prod
+        with:
+          TELEGRAM_BOT_TOKEN: '${{ secrets.TG_BOT_TOKEN }}'
+          CHAT_ID: '${{ secrets.TG_CHAT_ID }}'
+#          TOPIC_ID: 'YOUR_TOPIC_ID'
+          TG_MSG_MARKDOWN_V2: |
+            🅰️🌐*SERVICE_NAME*🌐 - build failed
+
+
+  Redeploy:
+    runs-on: "HOST_RUNNER_TAG"
+    needs: Build
+
+    steps:
+      - name: Checkout repo to $GITHUB_WORKSPACE
+        uses: actions/checkout@v3
+
+      - name: '(Re)start compose'
+        uses: vvpreo/gh-workflows/workflows/deploy-by-commit-ref@prod
+        with:
+          REGISTRY_HOST: 'ghcr.io'
+          GITHUB_TOKEN: '${{ secrets.REG_WRITE_TOKEN }}'
+          STAND_NAME: 'dev'
+
+      - name: 'Set stand tag'
+        uses: vvpreo/gh-workflows/workflows/set-tag@prod
+        with:
+          GITHUB_TOKEN: '${{ secrets.REG_WRITE_TOKEN }}'
+          TAG_BODY: 'DEV'
+          ADD_DATE_POSTFIX: 'YES'
+
+      - name: 'Delete latest tag'
+        uses: vvpreo/gh-workflows/workflows/delete-tag@prod
+        with:
+          GITHUB_TOKEN: '${{ secrets.REG_WRITE_TOKEN }}'
+          TAG_BODY: 'DEV'
+
+      - name: 'Set stand tag'
+        uses: vvpreo/gh-workflows/workflows/set-tag@prod
+        with:
+          GITHUB_TOKEN: '${{ secrets.REG_WRITE_TOKEN }}'
+          TAG_BODY: 'DEV'
+
+      - name: Notify OK
+        if: success()
+        uses: vvpreo/gh-workflows/workflows/tg-notify@prod
+        with:
+          TELEGRAM_BOT_TOKEN: '${{ secrets.TG_BOT_TOKEN }}'
+          CHAT_ID: '${{ secrets.TG_CHAT_ID }}'
+#          TOPIC_ID: 'YOUR_TOPIC_ID'
+          TG_MSG_MARKDOWN_V2: |
+            ✅🌐*SERVICE_NAME*🌐 - UP
+
+      - name: Notify Problem
+        if: failure()
+        uses: vvpreo/gh-workflows/workflows/tg-notify@prod
+        with:
+          TELEGRAM_BOT_TOKEN: '${{ secrets.TG_BOT_TOKEN }}'
+          CHAT_ID: '${{ secrets.TG_CHAT_ID }}'
+#          TOPIC_ID: 'YOUR_TOPIC_ID'
+          TG_MSG_MARKDOWN_V2: |
+            🅰️🌐*SERVICE_NAME*🌐 - DEV deploy failed
+
